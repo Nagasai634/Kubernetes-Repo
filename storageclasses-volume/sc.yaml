@@ -1,0 +1,24 @@
+#storageclasses
+apiVersion: storage.k8s.io/v1  
+kind: StorageClass
+metadata:
+  name: faster #user-friendly
+#this changes when vendor changes (vendors like gcp,aws,azure)
+provisioner: kubernetes.io/gce-pd  #you can visit the gke storageclass in google
+parameters:
+  type: pd-ssd  
+
+
+---
+#in dynamic provisioning you don't need to create pv when you create pvc it automatically creates pv(disk in GCP)in GKE
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-dynamic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: faster #it should match storageclass in our cluster
