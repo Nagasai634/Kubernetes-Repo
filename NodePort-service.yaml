@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc-deployment
+spec:
+  selector:
+    app: nginx-deployment  #it should match label of pod given in template metadata
+  ports:
+    - port: 8080 #Pod container port which is also called as target port
+      targetPort: 80  #service port
+      name: my-port
+      protocol: TCP
+  type: NodePort
+
+
+
+---
+#java-gradle
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-gradle-service
+spec:
+  selector:
+     app: java-gradle
+  ports:
+    - port: 8080 #pod container port 
+      targetPort: 8080 #service port
+      protocol: TCP
+      nodeport: 3200 #if you want particular nodeport 
+  type: NodePort
+       

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  strategy:
+     type: RollingUpdate
+     rollingUpdate:
+       maxUnavailable: 1
+       maxSurge: 1
+  selector:
+     matchLabels:
+       app: nginx-deployment
+  template:
+     metadata:
+       name: nginx
+       labels: 
+         app: nginx-deployment
+     spec:
+       containers:
+         - name: nginx
+           image: nginx
+           Ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-gradle-deployment
+spec:
+  replicas: 3
+  strategy:
+     type: RollingUpdate
+     rollingUpdate:
+       maxUnavailable: 1
+       maxSurge: 1
+  selector:
+     matchLabels:
+       app: java-gradle
+  template:
+     metadata:
+       name: java-gradle
+       labels:
+         app: java-gradle
+     spec:
+       containers:
+         - name: java-gradle
+           image: nagasaivardhan/java-gradle:v1
+           ports:
+            - containerPort: 8080
+  
+
+    
+
+

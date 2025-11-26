@@ -1,0 +1,20 @@
+#pv in cluster level 
+#PersistentVolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume
+spec:
+ # storage team give out this details for pv
+ #nfs is old one and now,everyone uses dynamic provisioning
+ nfs:
+  server: 34.30.132.13 #the ip of vm where nfs first installed either seperate vm or master
+  path: /opt/sfw #where yo want to store the data in remote(external storage)
+  readOnly: false
+ capacity:
+  storage: 1Gi
+ accessModes:
+   - ReadWriteMany #you can read and write data in pod using external storage
+   #Retain the data will be stored and Delete(in cloud) the data and external storage will be deleted
+ persistentVolumeReclaimPolicy: Recycle #recycle means data will be deleted after connection is over,so that it can be used for another pod
+

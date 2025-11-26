@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: deploy-pvc
+spec:
+  replicas: 2
+  selector:
+    matchLabels: 
+      name: deploy-pvc
+  template:
+    metadata:
+      labels:
+        name: deploy-pvc
+    spec:
+    #  RestartPolicy: Always
+     volumes:
+      - name: new-volume #any user-friendly 
+        persistentVolumeClaim:
+          claimName: nfs-pvc-claim
+     containers:
+      - name: pvc-cont
+        image: busybox
+        command: ['sh','-c','while true; do echo nagasaiAI!!!!! > /vardhan/output.txt; sleep 6; done']
+        volumeMounts:
+          - name: new-volume # name should match with volumes in Pod
+            mountPath: /vardhan
+

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-pod
+spec:
+  # A pod can have multiple volumes
+  volumes:
+    - name: new-volume #userfriendly but it should be important one 
+      hostPath:
+        path: /nsv/data #it is created in k8s clusternode the data is transfer here
+  containers:
+   - name: busybox
+     image: busybox
+     command: ['sh','-c','echo k8s-example > /vardhan/k8s.txt']
+     volumeMounts:
+      - name: new-volume  #it should match name of volume above in volumes
+        mountPath: /vardhan #your data stored here 

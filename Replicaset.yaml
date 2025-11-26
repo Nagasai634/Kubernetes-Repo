@@ -1,0 +1,82 @@
+# Replicaset with selector matchLabels  
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-replicaset
+  labels:
+    app: my-app
+    tier: backend 
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+        tier: backend
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+#  selector matchExpressions 
+# commands imperative way
+# kubectl run hydpod --image=nginx --labels="env=dev,tier=frontend,dc=hyd"
+# kubectl run mumpod --image=nginx --labels="env=dev,tier=frontend,dc=mum"
+# kubectl run chennaipod --image=nginx --labels="env=dev,tier=frontend,dc=chen"
+# kubectl run appod --image=nginx --labels="env=dev,tier=rs,dc=hyd"
+# kubectl run bangalorepod --image=nginx --labels="env=nondev,tier=frontend,dc=chen"
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend-matchlabels
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      env: dev  # Matches Pods that have the label 'env=dev'
+  template:
+    metadata:
+      labels:
+        env: dev
+        tier: frontend
+    spec:
+      containers:
+        - image: nginx
+          name: frontend-container
+
+
+---
+# ReplicaSetwithmatchExpression
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: backend-matchlabels
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      env: dev
+    matchExpressions:
+      - {key: env, operator: IN, values: dev}
+  template:
+   metadata:
+     labels:
+       env: dev
+       tier: development
+   spec:
+    containers:
+      image: nginx
+      ports:
+        containerport: 80
+   
+    
+
+

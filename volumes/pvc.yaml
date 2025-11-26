@@ -1,0 +1,15 @@
+#pvc is namespace level
+#PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc-claim #user-friendly but used later
+  namespace: default #important
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+
+

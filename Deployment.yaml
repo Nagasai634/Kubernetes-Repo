@@ -1,0 +1,58 @@
+
+# Deployment without Rolling Update 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
+
+
+
+
+
+---
+# Deployment with Rolling Update 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-deployment
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   #Maximum number of pods that can be unavailable during an update
+      maxSurge: 1  #Maximum number of pods that can be created above the desired number during an update
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
