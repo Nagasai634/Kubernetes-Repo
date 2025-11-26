@@ -10,7 +10,7 @@ parameters:
 
 
 ---
-#in dynamic provisioning you don't need to create pv when you create pvc it automatically creates pv(disk in GCP)in GKE
+#in dynamic provisioning you don't need to create pv when you create pvc it automatically creates pv(disk in GCP)in GKE BOUND happens 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -22,3 +22,45 @@ spec:
     requests:
       storage: 20Gi
   storageClassName: faster #it should match storageclass in our cluster
+
+---
+#in dynamic provisioning volumemod
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-claim-default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvc-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: new-app
+  template:
+    metadata:
+      labels:
+        app: new-app
+    spec:
+     volumes:
+       name: my-volume
+       persistentVolumeClaim:
+         claimName: pvc-claim-default
+     containers:
+       - name: nginx-webserver
+         image: nginx
+         ports:
+          - containerPort: 80
+         volumeMounts:
+          - name: my-volume
+         mountPath: "/siva"
