@@ -53,9 +53,9 @@ spec:
         app: new-app
     spec:
      volumes:
-       name: my-volume
-       persistentVolumeClaim:
-         claimName: pvc-claim-default
+       - name: my-volume
+         persistentVolumeClaim:
+           claimName: pvc-claim-default
      containers:
        - name: nginx-webserver
          image: nginx
@@ -63,4 +63,5 @@ spec:
           - containerPort: 80
          volumeMounts:
           - name: my-volume
-         mountPath: "/siva"
+            mountPath: "/vardhan"
+
