@@ -1,0 +1,19 @@
+#Configmap is used for store non-confidential which means we can share data openly
+#imperative way(configmap)
+# kubectl create configmap app-config \
+#   --from-literal=APP_ENV=production \
+#   --from-literal=APP_DEBUG=false
+#Declarative way(configmap)
+#configmap in this there is no spec it will replaced by data 
+#kubectl get cm cm-name -o yaml (cm=configmap)
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: app-configmap
+data:
+  APP_NAME: vardhan
+  APP_STAGE: production
+  new: |
+    hello all 
+    this is new batch of k8s
+
