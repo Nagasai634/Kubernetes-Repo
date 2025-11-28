@@ -1,0 +1,61 @@
+#env-deployment-example with static value
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: env-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+       app: env-deploy
+  template:
+    metadata:
+      labels:
+        app: env-deploy
+    spec:
+      # volumes:
+      #   - name: my-volume
+      #     persistentVolumeClaim:
+      #       claimName: pvc-claim-default
+      containers:
+        - name: busybox
+          image: busybox
+          command: ['sh','-c','echo configmap is : $CONFIGMAPVAR && sleep 3600']
+          volumeMounts:
+            - name: my-volume
+              mountPath: '/sai'
+          env:
+            - name: CONFIGMAPVAR #key
+              value: this is something new tried by using env-deploy #static value
+# kubectl logs env-deploy-67d4c59cd5-s59b5(podname)
+# sol:configmap is : this is something new tried by using env-deploy
+
+
+---
+#env-deployment-example from configmap 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: env-deploy-configmap
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+       app: env-deploy-configmap
+  template:
+    metadata:
+      labels:
+        app: env-deploy-configmap
+    spec:
+      containers:
+        - name: busybox
+          image: busybox
+          command: ['sh','-c','echo your app name is : $CONFIGMAPVAR && sleep 3600']
+          env:
+            - name: CONFIGMAPVAR #key
+              valueFrom: #from configmap created before
+                configMapKeyRef:
+                  name: app-configmap #name of configmap which is created before the name you wrote in metadata(kubectl get cm)
+                  key:  APP_NAME #in data you have wrote that keys (kubectl get cm cmname -o yaml)
