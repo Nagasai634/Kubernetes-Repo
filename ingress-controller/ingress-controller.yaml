@@ -19,7 +19,7 @@ spec:
               number: 80  #serviceport
 
 ---
-#context-based or route-based application L
+#context-based or route-based application LB
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -52,3 +52,53 @@ spec:
               number: 80
 
 ---
+#host-based or domain-based application LB
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-based-ingress
+spec:
+  rules:
+  - host: green.nagasaikonderu.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: deploy-ingress-green #it should match service name you gave
+            port:
+              number: 80
+  - host: blue.nagasaikonderu.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: deploy-ingress-blue
+            port:
+              number: 80
+  - host: orange.nagasaikonderu.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: deploy-ingress-orange
+            port:
+              number: 80
+  # - host: nagasaikonderu.xyz
+  #   http:
+  #     paths:
+  #     - pathType: Prefix
+  #       path: "/"
+  #       backend:
+  #         service:
+  #           name: deploy-new
+  #           port:
+  #             number: 80
+
+
+            
