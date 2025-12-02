@@ -1,3 +1,4 @@
+##kubectl expose deploy deploymentname --type LoadBalancer --port 80
 apiVersion: v1 
 kind: Service
 metadata: 
@@ -9,4 +10,4 @@ spec:
     - targetPort: 8080
       port: 80
       protocol: TCP
-  type: LoadBalancer
+  type: LoadBalancer #it will create network type load-balancer in gcloud which is (L4)

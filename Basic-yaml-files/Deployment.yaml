@@ -1,4 +1,4 @@
-
+#kubectl create deploy deploymentname --image nginx
 # Deployment without Rolling Update 
 apiVersion: apps/v1
 kind: Deployment
