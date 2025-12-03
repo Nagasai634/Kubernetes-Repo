@@ -1,0 +1,153 @@
+#DEPLOYMENT
+#kubectl create ns tls-ns (to create namespace)
+# kubectl apply -f all-green-deploy.yaml -n tls-ns
+#kubectl delete ingress green-ingress -n tls-ns
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: green-deployment
+  template:
+    metadata:
+      labels: 
+        name: green-deployment
+    spec:
+      containers:
+        - name: green-container
+          image: devopswithcloudhub/nginx:green
+          ports:
+            - containerPort: 80
+---
+#SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: green-service
+spec:
+  selector:
+    name: green-deployment
+  type: NodePort
+  ports:
+    - targetPort: 80
+      port: 80
+      protocol: TCP
+---
+#INGRESS-CONTROLLER-path
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: green-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: green-service
+            port:
+              number: 80
+---
+#INGRESS-CONTROLLER-domain-based
+# nslookup mygreen.nagasaikonderu.xyz (command to lookup whether ns paried or not)
+#watch curl mygreen.nagasaikonderu.xyz(create zone in dns and add standard A record with random name)
+#INGRESS-CONTROLLER-domain-based
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: green-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+spec:
+  tls:
+  - secretName: green-secret
+  rules:
+  - host: mygreen.nagasaikonderu.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: green-service
+            port:
+              number: 80
+
+---
+#this process is used for tls certificates
+#CA === comodo certificates
+#(ls | grep -i green)
+#openssl genrsa -out green.key 2048 (imp)
+
+#create a cert signing request(CSR)
+# openssl req -new -key green.key -out green.csr -subj "/CN=mygreen.nagasaikonderu.xyz" (imp)
+
+#sign the CSR with the CA certificate to create the SSL certificate
+# openssl x509 -req -days 365 -in green.csr -signkey green.key -out green.crt (imp)
+
+
+#to create tls secret in k8s
+#kubectl create secret tls green-secret --key green.key --cert green.crt --dry-run=client -o yaml (to check)
+#kubectl create secret tls green-secret --key green.key --cert green.crt -n tls-ns(imp 99% this is way in real time)
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: green-secret
+type: kubernetes.io/tls
+data: 
+  tls.crt: |
+        -----BEGIN CERTIFICATE-----
+        MIIC0TCCAbkCFCYoWPMFXwDt96W5XoNrrwmNfzxKMA0GCSqGSIb3DQEBCwUAMCUx
+        IzAhBgNVBAMMGm15Z3JlZW4ubmFnYXNhaWtvbmRlcnUueHl6MB4XDTI1MTIwMjEx
+        MjkxMVoXDTI2MTIwMjExMjkxMVowJTEjMCEGA1UEAwwabXlncmVlbi5uYWdhc2Fp
+        a29uZGVydS54eXowggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDGudcp
+        vwuNi0lC3W1JxWqVAVxlsBWhEuuRbiNE2habZfBBRhz/P/XznvGzc+vnJM0h5wgX
+        p2O5NTzThWjU/gyOdopIgL3VzWL+18GMLPFo6iF4IlIYAO1bxoalNOAfDGvk3sBy
+        IlkIdw6/jrqzIj2G9Rt1SD01SHzdjtyluF/cj7TM0iccjWzEbhj7iQLG6sceW87c
+        1iqQzBd5I/sHSi+BMIzngPwat9In1YdLz6NSrXfpJWzlTVSkAgEP7OtZrpVg2K7h
+        lD11XoAYSRR0XO/9mwg7l49KNvtNduYaqUW3CnmV/OQ5xAv0coDl17K2AvBMs8v5
+        Sc6PDgWWkV2BHHKxAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAIuLz6HEp+AyBw4i
+        ukWXSCZFeKYPATU32oXDfstFyVWliUTnEgka3ZJdHIIsn8zFzo+zkqrOzAcQ2YOd
+        gm6zxnhCDzCcxHmPYOV/Edo1qEDFpWHJKHyJImsr76q6c174fQrP1IQTIqi3f12J
+        jdr5yG9kn85Pt0DJlxbSzzF5oe+iOGPjzqNH1yThjIduRdMmKQiYfltxTZ8Lglx5
+        WhpTSQjtGyHoaPRFMXuGjoVv7RpidVfxtmflg6w6yOXZdVUKGxv5Ry8rD5Lz78yi
+        ML+Ul+SWHWOC8fW0hOsVt65uGHI5Zv8gVD0XfeHOEaL8X4yai8SkSpzXgAhwi/UM
+        BFmRwFc=
+        -----END CERTIFICATE-----
+  tls.key: |
+        -----BEGIN PRIVATE KEY-----
+        MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGudcpvwuNi0lC
+        3W1JxWqVAVxlsBWhEuuRbiNE2habZfBBRhz/P/XznvGzc+vnJM0h5wgXp2O5NTzT
+        hWjU/gyOdopIgL3VzWL+18GMLPFo6iF4IlIYAO1bxoalNOAfDGvk3sByIlkIdw6/
+        jrqzIj2G9Rt1SD01SHzdjtyluF/cj7TM0iccjWzEbhj7iQLG6sceW87c1iqQzBd5
+        I/sHSi+BMIzngPwat9In1YdLz6NSrXfpJWzlTVSkAgEP7OtZrpVg2K7hlD11XoAY
+        SRR0XO/9mwg7l49KNvtNduYaqUW3CnmV/OQ5xAv0coDl17K2AvBMs8v5Sc6PDgWW
+        kV2BHHKxAgMBAAECggEANmvzYBPZGpiv5fdUtBSzxP2b658mtTdEus2CLBtbgJAQ
+        lReZ3k8KUH7RKzdOPb0mzieCYFPva+uH7ldFJ7sw/hy5bvSOyEvYVfkJIJW4QOaJ
+        ZuhjOf6bAfyiqACMdgRFUeaspjUA0+Ai8lOojmEMn3ZlYB9536srwtMaWuncmr5l
+        3HVoH8XCUqrcrT87Dv2P9uLEj2IX0G3nh4tStk7Pk1V6fv91wbToRlfViwLsHxli
+        qNdxyyRXvY1WQCxfZPYUL4GKgr1TAnG4RNWVg4OI+D7q6abpzw5/2o4bucjFZ5ol
+        M01M/+ygVGeXhRMUCJ/iNpMq8gbVyP33g+lfZCsBXwKBgQD7eK6Lhs8ejowcwsEJ
+        4sRsztsZUsYO6RAMg9litVgokGeBsFL8Kl952SyhMpX9yB+Rg6d2XWki2qKwXVsK
+        sDBTXLN0jGrYNmG/e8Oohq2fgIMkpIuzI46oCO52ffIxNNdvsj6AAGoOkWNzYSwG
+        VwdbafprE+GJyc5bdXxUQ0AyJwKBgQDKTf6kUagcESo/fQrASDV1dJI2LOr/dI9Z
+        ArOUic8yTsMDPDrOF27KEmwNDFEhULUOwLGGWgumX5yx/a5uy9y9RpySsz+NAKwq
+        dmVk87mQLgQqwiWe+VDIRejyug5OzoDD2Q2O/at9WrrXG0REJHH3bYjEYFuDJ+L2
+        v8TRtHGzZwKBgQDkylWzqAFFAdhESoSq4+BmRoVcssxzwGPTnxnnDqqYrVkeyzeV
+        KVAYYhiSyJ1iefMOx0NTE4WWKmkeILG2Nbqh/ZNgFGkZMdEZEBdherb4iUnHytU3
+        NMCT7RxYPhpd3n+rpfXrK3VSr8BVtzEAy6lr6C3nwfzPCgZve6KUX2NGvQKBgALv
+        hM1vnefiW+GV9+z4X0Y4DdMZbcONNnNNNbvnEAmj2PKYEiZhcqsd/1FlJ1w7ZpUz
+        OKBBeD/OzWBL1RcogCiC+MysKzTpmJX5J9mCK+QqtsbEEHWxGnn9gbbb+k8scfPl
+        l2vGxJFKGsH6VFBE0x6LCVwIJevOTV3VRI7idm/rAoGAIOczyWLvbaKBKNCS07kK
+        BGgUqP3v8rD7tEaSRz1qV6hHR7nnmIltfWpVCxmTM/r90He3eEwgTFBhlIB00CcK
+        0biCUKzEEOcs0vndhtgiM2W20f2yO2TNlR12Iql3wGl0WTmE1KOa3neZNnb943An
+        7q8Ssat2DOYUstJ67IId60A=
+        -----END PRIVATE KEY-----
