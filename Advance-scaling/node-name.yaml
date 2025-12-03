@@ -1,0 +1,24 @@
+#node-name
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-name
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-name
+  template:
+    metadata:
+      labels:
+        app: node-name
+    spec:
+      nodeName: gke-nagasai-cluster-nonp-default-pool-656a2b57-2zzh #specify the node where pods have to deploy in
+      containers:
+        - name: node-name
+          image: nginx
+          ports:
+          - containerPort: 80
+#kubectl get nodes -o wide
+#kubectl get pods -o wide
+#good for testing not for production usage

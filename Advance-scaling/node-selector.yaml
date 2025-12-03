@@ -1,0 +1,27 @@
+#node-selector --> how to know the labels of node -->kubectl get nodes --show-labels
+#to label the node --> kubectl label node nodename disktype=ssd  ( kubectl label node gke-nagasai-cluster-nonp-default-pool-656a2b57-2zzh disktype=ssd)
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-selector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-selector
+  template:
+    metadata:
+      labels:
+        app: node-selector
+    spec:
+      nodeSelector:
+        disktype: ssd # key-value pair specify the node label it should match with node labels
+      containers:
+        - name: node-name
+          image: nginx
+          ports:
+          - containerPort: 80
+
+#kubectl label pod podname label- (to remove the label already gave)
+#kubectl label node nodename labelname-
