@@ -1,6 +1,6 @@
 #node-selector --> how to know the labels of node -->kubectl get nodes --show-labels
 #to label the node --> kubectl label node nodename disktype=ssd  ( kubectl label node gke-nagasai-cluster-nonp-default-pool-656a2b57-2zzh disktype=ssd)
-#
+#to override the label --> kubectl label node nodename disktype=ssd --overwrite
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,0 +1,28 @@
+#kubectl taint node nodename app=vardhan:NoSchedule -> to taint the node
+# kubectl taint node gke-nagasai-cluster-nonp-default-pool-656a2b57-2zzh app=vardhan:NoSchedule
+#kubectl scale deploy taint-toleration-node --replicas 4 (to scale the deploy)
+#kubectl taint nodes gke-nagasai-cluster-nonp-default-pool-656a2b57-2zzh app- (to untaint the node)
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: taint-toleration-node
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taint-toleration-node
+  template:
+    metadata:
+      labels:
+        app: taint-toleration-node
+    spec:
+      tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "vardhan"
+        effect: "NoSchedule"
+      containers:
+       - name: taint-toleration-node
+         image: nginx
+         ports:
+         - containerPort: 80 

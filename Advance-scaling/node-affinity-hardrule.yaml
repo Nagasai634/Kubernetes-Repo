@@ -1,0 +1,95 @@
+#node-affinity
+# kubectl get nodes --show-labels | grep -i disktype 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-affinity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-affinity
+  template:
+    metadata:
+      labels:
+        app: node-affinity
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution: #hardrule
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype #key and values should match when you give in as operator in node labels
+                operator: In
+                values:
+                - ssd
+                - hdd
+      containers:
+        - name: node-affinity
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+
+---
+#NotIn operator which means this deployment will happen in node where this node labels doesn't exist
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-affinity-notin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-affinity-notin
+  template:
+    metadata:
+      labels:
+        app: node-affinity-notin
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution: #hardrule
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype 
+                operator: NotIn
+                values:
+                - ssd
+                - hdd
+      containers:
+        - name: node-affinity-notin
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+
+---
+#Exists operator which means this deployment will happen in node where this node label key exists and in Exists operator values don't needed
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-affinity-exists
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-affinity-exists
+  template:
+    metadata:
+      labels:
+        app: node-affinity-exists
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution: #hardrule
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype 
+                operator: Exists
+      containers:
+        - name: node-affinity-exists
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+#key must exists and values can be anything
