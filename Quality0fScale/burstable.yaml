@@ -1,0 +1,18 @@
+#burstable -> when you write requests and limits in Pods(container resources) then K8S marks them as burstable
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burstable
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: "125m"
+          memory: "250Mi"
+        limits:
+          cpu: "250m"
+          memory: "500Mi"

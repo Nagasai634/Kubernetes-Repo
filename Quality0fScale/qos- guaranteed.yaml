@@ -1,0 +1,19 @@
+#Quareented -> when you write requests and limits as same in Pods(container resources) then K8S marks them as Quareented 
+#but requests and limits must match
+apiVersion: v1
+kind: Pod
+metadata:
+  name: best-effort
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: "125m"
+          memory: "250Mi"
+        limits:
+          cpu: "125m"
+          memory: "250Mi"
