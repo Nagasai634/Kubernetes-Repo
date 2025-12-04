@@ -1,0 +1,36 @@
+#readinessProbe
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: readiness-http
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80 #(container Port)
+        initialDelaySeconds: 5
+        periodSeconds: 5
+
+---
+#readiness-fail
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: readiness-fail
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        httpGet:
+          path: /healthy
+          port: 80 #(container Port)
+        initialDelaySeconds: 5
+        periodSeconds: 5

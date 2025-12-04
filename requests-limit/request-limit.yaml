@@ -1,0 +1,19 @@
+#resources -> containers resources like cpu,memory
+#requests -> minimum limit of resource needed to run inside the container 
+#limits -> maximum limit of resources 
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: pod 
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ['sh','-c','echo app is running && sleep 3600']
+      resources:
+        requests:
+          memory: "128Mi" #we give memory value as bytes only
+          cpu: "125m" 
+        limits:
+          memory: "256Mi" #best to give double of request incase your app recieves more logs
+          cpu: "250m" #we give cpu value in core only
