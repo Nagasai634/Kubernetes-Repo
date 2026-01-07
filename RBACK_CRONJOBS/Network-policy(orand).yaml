@@ -1,0 +1,49 @@
+# OR condition from either namespaceselector,podselectoripblock if anything is matched with pod then or condition is satisified
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-http
+  namespace: vardhan
+spec:
+  podSelector: {} #selects all pods in namespace
+  policyTypes:
+  - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: vardhan #label should match with template.metadata.label
+      - podSelector:
+          matchLabels:
+            name: nginx #label should match with template.metadata.label
+      - ipBlock:
+          cidr: 136.11.154.08/32
+      ports:
+      - protocol: TCP
+        port: 80
+
+# AND condition from either namespaceselector,podselectoripblock if everything has to match with pod then and condition is satisified
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-http
+  namespace: vardhan
+spec:
+  podSelector: {} #selects all pods in namespace
+  policyTypes:
+  - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: vardhan #label should match with template.metadata.label
+        podSelector:
+          matchLabels:
+            name: nginx #label should match with template.metadata.label
+        ipBlock:
+          cidr: 136.11.154.08/32
+      ports:
+      - protocol: TCP
+        port: 80

@@ -1,0 +1,52 @@
+# defaultdeny network policy is yaml file which automatically creates whne cluster is created
+# A Default Deny NetworkPolicy means: All traffic is blocked by default
+#  Only traffic you explicitly allow can reach the Pods 
+
+#currently in namespace there is no network policy means all traffic is allowed everything is default allowed
+# creating a network policy to deny all the traffic
+#default network policy to deny
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: vardhan
+spec:
+  podSelector: {} #selects all pods in namespace
+  policyTypes:
+  - Ingress
+  - Egress
+
+#later i will create a network policy to allow some traffic based on requried
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-http
+  namespace: vardhan
+spec:
+  podSelector: {} #selects all pods in namespace
+  policyTypes:
+  - Ingress
+  ingress:
+    ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-http
+  namespace: vardhan
+spec:
+  podSelector: {} #selects all pods in namespace
+  policyTypes:
+  - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            name: nginx #label should match with template.metadata.label
+      ports:
+      - protocol: TCP
+        port: 80
+
