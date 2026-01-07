@@ -8,7 +8,7 @@ metadata:
 rules:
 - apiGroups: ["","apps"] #apiversion of resources you want to give access to this particular role
   resources: ["pods","deployment"] #what type of resources you want to give access to this particular role
-  verbs: ["get","watch","list"] #
+  verbs: ["get","watch","list"] #kubectl commands yo want to run for those resources
 
 ---
 #Rolebinding (giving permissions to person to above role)
