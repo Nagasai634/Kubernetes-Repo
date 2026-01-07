@@ -1,24 +1,26 @@
+#Role
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: vardhan
   name: pod-reader
 rules:
-- apiGroups: ["","apps"]
-  resources: ["pods","deployment"]
-  verbs: ["get","watch","list"]
+- apiGroups: ["","apps"] #apiversion of resources you want to give access to this particular role
+  resources: ["pods","deployment"] #what type of resources you want to give access to this particular role
+  verbs: ["get","watch","list"] #
 
 ---
+#Rolebinding (giving permissions to person to above role)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: developer-role-binding
-  namespace: vardhan
+  namespace: vardhan #it should match namespace in metadata(role)
 subjects:
 - kind: User
-  name: sai
+  name: sai #user you want to give access to
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
-  name: pod-reader
+  kind: Role #it can be clusterrole also
+  name: pod-reader #name should match above role name in metadata
   apiGroup: rbac.authorization.k8s.io
