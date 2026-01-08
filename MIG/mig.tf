@@ -1,8 +1,7 @@
 provider "google" {
-    project = "	intrepid-axe-482904-f4"
+    project = "intrepid-axe-482904-f4"
     region = "us-central1"
-    credentials = file("/c/Users/hr461/Downloads/harness-svc.json")
-
+    credentials = file("harness-svc.json")
 }
 
 data "google_compute_network" "net" {
@@ -29,20 +28,30 @@ resource "google_compute_health_check" "health" {
 }
 
 resource "google_compute_instance_template" "instance_temp" {
-    name_prefix = "apache2"
-    machine_type = "e2-medium"
-    disk {
-      source = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
-      boot = true
-      auto_delete = true
-    }
-    network_interface {
-      network = data.google_compute_network.net.name
-      access_config {
-        
-      }
-    }
+  name_prefix  = "apache2"
+  machine_type = "e2-medium"
+
+  disk {
+    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+    boot        = true
+    auto_delete = true
+  }
+
+  network_interface {
+    network = data.google_compute_network.net.name
+    access_config {}
+  }
+
+  metadata_startup_script = <<-EOF
+    #!/bin/bash
+    apt update -y
+    apt install apache2 -y
+    systemctl start apache2
+    systemctl enable apache2
+  EOF
 }
+
+
 
 resource "google_compute_instance_group_manager" "MIG" {
     name = "apache2-mig"
@@ -65,13 +74,13 @@ resource "google_compute_backend_service" "service" {
     port_name = "http"
     health_checks = [google_compute_health_check.health.id]
     backend {
-      group = google_compute_instance_group_manager.MIG.id
+      group = google_compute_instance_group_manager.MIG.instance_group
     }
   
 }
 
 resource "google_compute_url_map" "url" {
-    name = "apache-url"
+    name = "apache2"
     default_service = google_compute_backend_service.service.id
 
 }
@@ -87,6 +96,7 @@ resource "google_compute_global_forwarding_rule" "ford_rule" {
     port_range = "80"
   
 }
+
 
 
 output "load_balancer_ipaddress" {
