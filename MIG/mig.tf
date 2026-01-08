@@ -1,6 +1,6 @@
 provider "google" {
-    project = ""
-    region = ""
+    project = "	intrepid-axe-482904-f4"
+    region = "us-central1"
 
 }
 
@@ -31,7 +31,7 @@ resource "google_compute_instance_template" "instance_temp" {
     name_prefix = "apache2"
     machine_type = "e2-medium"
     disk {
-      source = ""
+      source = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
       boot = true
       auto_delete = true
     }
@@ -45,7 +45,7 @@ resource "google_compute_instance_template" "instance_temp" {
 
 resource "google_compute_instance_group_manager" "MIG" {
     name = "apache2-mig"
-    zone = ""
+    zone = "us-central1-a"
     base_instance_name = "apache"
     version {
       instance_template = google_compute_instance_template.instance_temp.id
@@ -64,7 +64,7 @@ resource "google_compute_backend_service" "service" {
     port_name = "http"
     health_checks = [google_compute_health_check.health.id]
     backend {
-      group = 
+      group = google_compute_instance_group_manager.MIG.id
     }
   
 }
