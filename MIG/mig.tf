@@ -1,6 +1,7 @@
 provider "google" {
     project = "	intrepid-axe-482904-f4"
     region = "us-central1"
+    credentials = file("/c/Users/hr461/Downloads/harness-svc.json")
 
 }
 
