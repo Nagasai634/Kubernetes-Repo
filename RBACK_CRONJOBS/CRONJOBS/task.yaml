@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: task-job
+spec:
+  template:
+    metadata:
+      name: task-job
+    spec:
+      containers:
+        - name: c1
+          image: busybox
+          imagePullPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4 # Number of retries before marking the job is failed
+  activeDeadlineSeconds: 10 # Maximum time the job can run
+  parallelism: 1 # number of pods to run in parallel
+  completions: 1 # number of pod to complete before marking job as complete
