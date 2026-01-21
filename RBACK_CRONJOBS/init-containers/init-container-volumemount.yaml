@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-vol
+  labels:
+    app: nginx
+spec:
+  volumes:
+  - name: sai
+    emptyDir: {}  #empheral storage shared between the init and main containers
+  initContainers:
+  - name: busyboxer
+    image: busybox
+    command:
+    - wget
+    - "-O"
+    - "/sai/index.html"
+    - "https://example.com"
+    volumeMounts:
+    - name: sai
+      mountPath: /sai
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: sai
+      mountPath: /usr/share/nginx/html
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  selector:
+    app: nginx
+  type: NodePort
+  ports:
+  - targetPort: 80
+    port: 80
+    protocol: TCP

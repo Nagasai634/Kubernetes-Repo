@@ -1,0 +1,20 @@
+#init containers are used for startup process for main containers. once during startup process of a pod
+#if init containers are succesful then main application container works otherwise main container fails.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-container
+spec:
+  initContainers:
+    - name: init-cont1
+      image: busybox
+      command: ['sh','-c','echo "Init-1: Downloading config file..."; sleep 5']
+    - name: init-cont2
+      image: busybox
+      command: ['sh','-c','echo "failing init-cont2"; exit 1']
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+      - containerPort: 80
