@@ -28,7 +28,8 @@ spec:
     - name: sai
       mountPath: /usr/share/nginx/html
 
-
+#to look logs of different containers we can run this command==>kubectl logs pod name -c containername for example above pod
+#kubectl logs init-vol -c busyboxer
 
 ---
 apiVersion: v1
